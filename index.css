@@ -1,0 +1,633 @@
+/* ==========================================================================
+   67 LOW EFFORT CHALLENGE - Intentionally Ugly Stylesheet
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  /* FORCE COMIC SANS EVERYWHERE */
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", cursive, sans-serif !important;
+}
+
+body {
+  /* Clashing bright green background */
+  background-color: #00ff00;
+  color: #000000;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Geocities style scrolling marquee banner */
+.low-effort-banner {
+  background-color: #ff00ff;
+  color: #ffff00;
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 8px 0;
+  border: 4px solid #0000ff;
+  margin-bottom: 15px;
+  width: 100%;
+  max-width: 1250px;
+  box-shadow: 5px 5px 0px #000;
+}
+
+/* Wrapper looks like an old MS Paint window */
+.arcade-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffff00; /* Clashing yellow */
+  border: 6px solid #000000;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Header with WordArt style shadows */
+.arcade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 6px solid #000000;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.logo-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  letter-spacing: -1px;
+}
+
+/* Fake 90s WordArt effect */
+.w-word {
+  color: #ff0000;
+  text-shadow: 2px 2px 0px #0000ff, 4px 4px 0px #ff00ff;
+}
+.w-word2 {
+  color: #0000ff;
+  text-shadow: 2px 2px 0px #00ff00, 4px 4px 0px #ff0000;
+}
+.w-word3 {
+  color: #ff00ff;
+  text-shadow: 2px 2px 0px #ffff00, 4px 4px 0px #00ffff;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: #ff0000;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* Simple flat buttons */
+.btn-retro {
+  background: #ff00ff;
+  border: 4px solid #000;
+  color: #fff;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 4px 4px 0px #000;
+  transition: transform 0.05s;
+}
+
+.btn-retro:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+}
+
+.btn-retro.muted {
+  background: #00ffff;
+  color: #000;
+}
+
+.btn-retro-large {
+  background: #ff0000;
+  border: 4px solid #000;
+  color: #fff;
+  padding: 14px 28px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 6px 6px 0px #000;
+  text-transform: uppercase;
+  transition: transform 0.05s;
+}
+
+.btn-retro-large:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.btn-retro-large:disabled {
+  background: #888;
+  color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Layout Grid */
+.arcade-grid {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 32px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+/* MS Paint style panels */
+.panel {
+  background: #ffffff; /* plain white panels */
+  border: 4px solid #000000;
+  border-radius: 0px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 6px 6px 0px #000;
+}
+
+.panel-header {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: 4px solid #000000;
+  padding-bottom: 6px;
+  color: #0000ff; /* plain blue headers */
+  text-transform: uppercase;
+}
+
+.panel-header.mini {
+  font-size: 0.9rem;
+  color: #ff00ff; /* plain purple */
+}
+
+/* Left Panel - Telemetry */
+.stat-box {
+  background: #ffffcc; /* light yellow post-it style */
+  border: 3px solid #000;
+  padding: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.stat-value.timer {
+  color: #ff0000; /* red time */
+}
+
+.score-box {
+  border-left: 8px solid #ff00ff;
+}
+
+.score-glow {
+  color: #ff0000;
+}
+
+.multiplier-val {
+  color: #0000ff;
+}
+
+/* Combo Progress Bar */
+.progress-bar-container {
+  height: 12px;
+  background: #ddd;
+  border: 2px solid #000;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #ff00ff; /* purple progress fill */
+}
+
+.telemetry-subgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.mini-stat {
+  background: #f0f0f0;
+  border: 2px solid #000;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mini-label {
+  font-size: 0.6rem;
+  color: #333;
+}
+
+.mini-value {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Center Panel - Canvas box */
+.panel-center {
+  width: 816px; /* 800px canvas + 8px border * 2 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.canvas-container {
+  position: relative;
+  width: 800px;
+  height: 600px;
+  background: #fff;
+  border: 8px solid #ff0000; /* bright red border */
+  box-shadow: 8px 8px 0px #000000;
+  overflow: hidden;
+}
+
+/* Solid red borders when hype kicks in */
+.canvas-container.hype-active-border {
+  border-color: #0000ff !important;
+}
+
+.canvas-container.hype-super-border {
+  border-color: #ff00ff !important;
+  animation: boxColors 0.2s linear infinite;
+}
+
+@keyframes boxColors {
+  0% { border-color: #ff00ff; }
+  50% { border-color: #ffff00; }
+  100% { border-color: #00ffff; }
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.screen-glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Full screens overlay */
+.screen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 255, 0, 0.9); /* clashing green */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  text-align: center;
+}
+
+.overlay-content {
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.overlay-content h2 {
+  font-size: 2rem;
+  color: #ff0000;
+  text-shadow: 2px 2px #fff;
+}
+
+.instructions-quick {
+  text-align: left;
+  background: #ffffcc;
+  border: 3px solid #000;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #000;
+  width: 100%;
+}
+.instructions-quick p {
+  margin-bottom: 4px;
+}
+
+.calibration-blocker {
+  background: #ffcc00;
+  border: 4px dashed red;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  animation: blockerColor 0.5s ease infinite alternate;
+}
+
+@keyframes blockerColor {
+  0% { background: #ffcc00; color: #000; }
+  100% { background: #ff0000; color: #fff; }
+}
+
+.status-subtext {
+  font-size: 0.65rem;
+  color: #000;
+  font-weight: bold;
+}
+
+/* Ugly spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 8px solid #ff0000;
+  border-left-color: #0000ff;
+  animation: spin 0.5s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Countdown big text */
+.countdown-text {
+  font-size: 10rem;
+  font-weight: bold;
+  color: #ff00ff;
+  text-shadow: 4px 4px 0px #000;
+  animation: countdownPulse 1s ease infinite;
+}
+
+@keyframes countdownPulse {
+  0% { transform: scale(1.4); }
+  100% { transform: scale(0.9); }
+}
+
+/* Photo capture preview */
+.photo-preview-box {
+  background: #f0f0f0;
+  border: 3px solid #000;
+  padding: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 180px;
+}
+
+.photo-label {
+  font-size: 0.6rem;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 4px;
+}
+
+#capture-preview-img {
+  width: 160px;
+  height: 120px;
+  border: 2px solid #000;
+  object-fit: cover;
+  background-color: #333;
+}
+
+.photo-placeholder-text {
+  font-size: 0.75rem;
+  color: #888;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.final-score-display {
+  background: #ffcc00;
+  border: 4px solid #000;
+  padding: 10px 20px;
+}
+
+.final-label {
+  font-size: 0.6rem;
+  color: #000;
+  font-weight: bold;
+}
+
+.final-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #0000ff;
+}
+
+.save-score-form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.save-score-form label {
+  font-size: 0.65rem;
+  font-weight: bold;
+}
+
+.save-score-form input {
+  background: #fff;
+  border: 3px solid #000;
+  padding: 6px;
+  font-size: 1.3rem;
+  text-align: center;
+  text-transform: uppercase;
+  width: 100px;
+  letter-spacing: 2px;
+}
+
+/* Right Panel - Leaderboard Only Layout */
+.panel-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px;
+  background: #ffffff;
+  border: 4px solid #000;
+  box-shadow: 6px 6px 0px #000;
+}
+
+.leaderboard-box {
+  background: #ccffff; /* light cyan */
+  border: 3px solid #000;
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.leaderboard-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.leaderboard-card {
+  display: flex;
+  align-items: center;
+  border: 4px solid #000;
+  padding: 10px;
+  gap: 14px;
+  box-shadow: 4px 4px 0px #000;
+  transition: transform 0.1s ease;
+}
+
+.leaderboard-card.rank-1 {
+  border-color: #ff0000; /* Red border for 1st place card */
+  background: #ffccff; /* light pink */
+}
+.leaderboard-card.rank-2 {
+  border-color: #0000ff; /* Blue border for 2nd place */
+  background: #ffffcc; /* light yellow */
+}
+.leaderboard-card.rank-3 {
+  border-color: #ff00ff; /* Purple border for 3rd place */
+  background: #e0f0f0; /* light gray/blue */
+}
+
+.leaderboard-img-wrapper {
+  width: 90px;
+  height: 90px;
+  border: 3px solid #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #333;
+  flex-shrink: 0;
+}
+
+.leaderboard-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.3); /* Slightly zoomed in on face */
+}
+
+.leaderboard-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.leaderboard-card-rank {
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #ff0000;
+  text-shadow: 1px 1px #fff;
+  text-transform: uppercase;
+}
+
+.leaderboard-card-score {
+  font-size: 1.35rem;
+  font-weight: bold;
+  color: #0000ff;
+}
+
+.leaderboard-card-tier {
+  font-size: 0.75rem;
+  color: #555;
+  font-weight: bold;
+}
+
+.rank-highlight {
+  background: #ff00ff !important;
+  color: #fff !important;
+}
+
+/* Footer Section */
+.arcade-footer {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 4px solid #000;
+  padding-top: 8px;
+  font-size: 0.7rem;
+  color: #000;
+}
+
+/* Animations */
+.animate-pulse {
+  animation: pulse-glow 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+.highlight-red {
+  color: red !important;
+}
+
+.highlight-blue {
+  color: blue !important;
+}
+
+.text-shake {
+  animation: textShake 0.2s linear infinite;
+}
+
+@keyframes textShake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  50% { transform: translate(-1px, -1px) rotate(-1deg); }
+  100% { transform: translate(1px, -1px) rotate(1deg); }
+}
+
+/* Screen shake for HYPE peak */
+.screen-shake-effect {
+  animation: screenShake 0.1s linear infinite;
+}
+
+@keyframes screenShake {
+  0% { transform: translate(2px, 2px); }
+  50% { transform: translate(-2px, -2px); }
+  100% { transform: translate(2px, -2px); }
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>67 LOW EFFORT CHALLENGE!!!</title>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="index.css">
+  
+  <!-- MediaPipe CDN Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="arcade-wrapper">
+    <!-- Low-budget scrolling marquee and blinking text for 90s website feel -->
+    <marquee class="low-effort-banner" scrollamount="12">
+      🔥🔥🔥 WELCOME TO THE ULTIMATE 67 SPEEDRUN CHAMPIONSHIP!!! NO CLICKS ALLOWED!!! HOLD UP HANDS TO START!!! 🔥🔥🔥
+    </marquee>
+
+    <!-- Screen Glare Overlay -->
+    <div class="screen-glare"></div>
+
+    <header class="arcade-header">
+      <div class="logo-container">
+        <!-- MS WordArt style text -->
+        <h1 class="logo-text" id="arcade-title">
+          <span class="w-word">67</span> 
+          <span class="w-word2">Hype</span> 
+          <span class="w-word3">Arena</span>
+        </h1>
+        <p class="subtitle">⚠️ WARNING: HIGH BRAINROT LEVEL ⚠️</p>
+      </div>
+      <div class="audio-control">
+        <button id="btn-audio-toggle" class="btn-retro muted" aria-label="Toggle Sound">
+          <span class="icon">🔇</span> <span class="label">SOUND OFF</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="arcade-grid">
+      <!-- LEFT PANEL: Scoreboard & Stats -->
+      <section class="panel panel-left" id="panel-stats">
+        <div class="panel-header">📝 STATS BOX</div>
+        
+        <div class="stat-box">
+          <div class="stat-label">⏳ TIME REMAINING</div>
+          <div class="stat-value timer" id="timer-val">10.00s</div>
+        </div>
+
+        <div class="stat-box score-box">
+          <div class="stat-label">💯 TOTAL SCORE</div>
+          <div class="stat-value score-glow" id="score-val">00000</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-label">🚀 COMBO SPEED</div>
+          <div class="stat-value multiplier-val" id="multiplier-val">x1</div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="combo-bar-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="telemetry-subgrid">
+          <div class="mini-stat">
+            <span class="mini-label">SPEED (GPS)</span>
+            <span class="mini-value" id="gps-val">0.0</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-label">TIER</span>
+            <span class="mini-value alert-text" id="hype-tier-val">CHILLIN'</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CENTER PANEL: Game Screen & Webcam Canvas -->
+      <section class="panel-center">
+        <!-- Hidden video element for MediaPipe input (offscreen to keep stream active) -->
+        <video id="webcam-video" autoplay playsinline style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; left: -9999px;"></video>
+        
+        <div class="canvas-container">
+          <!-- Mirrored canvas for the webcam feed + hand skeleton + overlays -->
+          <canvas id="game-canvas" width="800" height="600"></canvas>
+          
+          <!-- Loading Overlay -->
+          <div class="screen-overlay" id="loading-overlay">
+            <div class="overlay-content">
+              <div class="spinner"></div>
+              <h2>LOADING AWESOME CV CODE...</h2>
+              <p>Hurry up and allow camera access!</p>
+            </div>
+          </div>
+
+          <!-- Start/Calibration Overlay -->
+          <div class="screen-overlay" id="start-overlay" style="display: none;">
+            <div class="overlay-content">
+              <h2 class="animate-pulse highlight-red">🚨 SHOW YOUR HANDS! 🚨</h2>
+              <div class="instructions-quick">
+                <p>1. Put both hands in camera view.</p>
+                <p>2. Keep palms flat and facing screen.</p>
+                <p>3. Keep hands there during the countdown!</p>
+              </div>
+              <div id="btn-start-game" class="calibration-blocker">
+                WAITING FOR PALMS...
+              </div>
+              <p class="status-subtext" id="calibration-status">Waiting for camera feed...</p>
+            </div>
+          </div>
+
+          <!-- Countdown Overlay -->
+          <div class="screen-overlay" id="countdown-overlay" style="display: none;">
+            <div class="countdown-text" id="countdown-val">3</div>
+          </div>
+
+          <!-- Game Over / Save Score Overlay -->
+          <div class="screen-overlay" id="gameover-overlay" style="display: none;">
+            <div class="overlay-content">
+              <h2 class="text-shake highlight-blue">🎉 GAME OVER!!! 🎉</h2>
+              <div class="final-score-display">
+                <span class="final-label">YOUR FINAL SCORE</span>
+                <span class="final-value" id="final-score-val">0</span>
+              </div>
+              
+              <!-- Captured photo preview shown after game finishes -->
+              <div class="photo-preview-box">
+                <p class="photo-label">📸 YOUR CAPTURED PIC:</p>
+                <img id="capture-preview-img" src="" alt="Captured game face" style="display: none;">
+                <div id="no-photo-taken" class="photo-placeholder-text">No photo taken yet...</div>
+              </div>
+
+              <div class="auto-reset-message" id="auto-reset-message" style="font-weight: bold; margin-top: 15px; color: red;">
+                RESETTING TO READY STATE IN 4s...
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT PANEL: Hype Meter, Challenges & Leaderboard -->
+      <section class="panel panel-right" id="panel-challenge">
+        <div class="leaderboard-box">
+          <div class="panel-header">🏆 TOP 3 HIGHEST SCORES 🏆</div>
+          <div id="leaderboard-cards-container" class="leaderboard-cards-container">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="arcade-footer">
+      <div class="footer-instruction">
+        👉 <strong>HOW TO PLAY:</strong> Bob palms up/down in alternating fashion. Do 6 or 7 signs when told to get high score!
+      </div>
+      <div class="controls-guide">
+        Made with 💀 brainrot 💀
+      </div>
+    </footer>
+  </div>
+
+  <!-- Game Logic Script -->
+  <script src="app.js?v=9"></script>
+</body>
+</html>
