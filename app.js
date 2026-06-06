@@ -12,7 +12,7 @@ const STATE_GAMEOVER = 'gameover';
 let gameState = STATE_LOADING;
 
 // Game Settings
-const GAME_DURATION = 10000; // 10 seconds per game
+const GAME_DURATION = 6700; // 6.7 seconds per game
 const BOB_THRESHOLD = 0.05;   // Minimum Y movement amplitude (tuned for sensitivity)
 const SMOOTHING_FACTOR = 2;   // Reduced smoothing for less latency
 
@@ -25,6 +25,8 @@ let multiplier = 1;
 let timeLeft = GAME_DURATION;
 let gameTimerInterval = null;
 let countdownInterval = null;
+let bobCount = 0;
+let toiletActiveTimers = [0, 0, 0, 0];
 
 // Telemetry / Speed calculation
 let bobTimes = [];
@@ -47,14 +49,16 @@ let countdownTimeLeft = 1500;
 let lastFrameTimestamp = 0;
 const CALIBRATION_REQUIRED_HOLD = 1500; // 1.5 seconds
 let prevWristPositions = { left: null, right: null };
-let gameOverCountdownInterval = null;
-let gameOverSecondsLeft = 8;
-
 // Camera Snapshot variables
 let snapshotTimeMs = 7500; // Target snapshot time (randomized each game)
 let isSnapshotTaken = false;
 let playerPhoto = null; // Stores base64 data URL
 let flashOpacity = 0.0;
+let lastGameScore = 0;
+let hasPlayed = false;
+let isCooldownActive = false;
+let cooldownTimeLeft = 3;
+let cooldownInterval = null;
 
 // Floating text animations
 let floatingTexts = [];
@@ -64,7 +68,7 @@ let audioCtx = null;
 let bgMusicInterval = null;
 let bgBeatStep = 0;
 let isAudioMuted = true;
-let shouldSaveScore = true;
+let shouldSaveScore = false;
 
 // DOM Elements
 const videoEl = document.getElementById('webcam-video');
@@ -82,13 +86,23 @@ const loadingOverlay = document.getElementById('loading-overlay');
 const startOverlay = document.getElementById('start-overlay');
 const countdownOverlay = document.getElementById('countdown-overlay');
 const countdownValEl = document.getElementById('countdown-val');
-const gameoverOverlay = document.getElementById('gameover-overlay');
-const finalScoreValEl = document.getElementById('final-score-val');
-
-const autoResetMessageEl = document.getElementById('auto-reset-message');
 const btnAudioToggle = document.getElementById('btn-audio-toggle');
 const btnSaveToggle = document.getElementById('btn-save-toggle');
+const savePromptOverlay = document.getElementById('save-prompt-overlay');
+const promptScoreVal = document.getElementById('prompt-score-val');
+const promptPreviewImg = document.getElementById('prompt-preview-img');
+const btnSaveYes = document.getElementById('btn-save-yes');
+const btnSaveNo = document.getElementById('btn-save-no');
 const calibrationStatusEl = document.getElementById('calibration-status');
+const startGameoverBanner = document.getElementById('start-gameover-banner');
+const startFinalScoreVal = document.getElementById('start-final-score-val');
+
+const toiletPops = [
+  document.getElementById('toilet-pop-tl'),
+  document.getElementById('toilet-pop-tr'),
+  document.getElementById('toilet-pop-bl'),
+  document.getElementById('toilet-pop-br')
+];
 
 const hypeFillBarEl = document.getElementById('hype-fill-bar');
 const hypeFlameValEl = document.getElementById('hype-flame-val');
@@ -207,6 +221,34 @@ function playSound(type) {
     osc.start(now);
     osc.stop(now + 0.6);
   }
+  else if (type === 'toggle') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, now);
+    osc.frequency.linearRampToValueAtTime(300, now + 0.15);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
+  else if (type === 'yes') {
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(523.25, now);
+    osc.frequency.setValueAtTime(659.25, now + 0.08);
+    osc.frequency.setValueAtTime(783.99, now + 0.16);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+  else if (type === 'no') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(300, now);
+    osc.frequency.linearRampToValueAtTime(150, now + 0.35);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    osc.start(now);
+    osc.stop(now + 0.4);
+  }
 }
 
 // Background drill bass track scheduler
@@ -285,26 +327,29 @@ function playBassStep() {
    UI Controls & Init
    ========================================================================== */
 
-btnAudioToggle.addEventListener('click', () => {
-  initAudio();
-  isAudioMuted = !isAudioMuted;
-  
-  if (isAudioMuted) {
-    btnAudioToggle.classList.add('muted');
-    btnAudioToggle.querySelector('.icon').innerText = '🔇';
-    btnAudioToggle.querySelector('.label').innerText = 'SOUND OFF';
-    stopBassTrack();
-  } else {
-    btnAudioToggle.classList.remove('muted');
-    btnAudioToggle.querySelector('.icon').innerText = '🔊';
-    btnAudioToggle.querySelector('.label').innerText = 'SOUND ON';
-    if (gameState === STATE_PLAYING) {
-      startBassTrack();
+if (btnAudioToggle) {
+  btnAudioToggle.addEventListener('click', () => {
+    initAudio();
+    isAudioMuted = !isAudioMuted;
+    
+    if (isAudioMuted) {
+      btnAudioToggle.classList.add('muted');
+      btnAudioToggle.querySelector('.icon').innerText = '🔇';
+      btnAudioToggle.querySelector('.label').innerText = 'SOUND OFF';
+      stopBassTrack();
+    } else {
+      btnAudioToggle.classList.remove('muted');
+      btnAudioToggle.querySelector('.icon').innerText = '🔊';
+      btnAudioToggle.querySelector('.label').innerText = 'SOUND ON';
+      if (gameState === STATE_PLAYING) {
+        startBassTrack();
+      }
     }
-  }
-});
+  });
+}
 
 btnSaveToggle.addEventListener('click', () => {
+  initAudio();
   shouldSaveScore = !shouldSaveScore;
   if (shouldSaveScore) {
     btnSaveToggle.classList.remove('muted');
@@ -315,7 +360,58 @@ btnSaveToggle.addEventListener('click', () => {
     btnSaveToggle.querySelector('.icon').innerText = '❌';
     btnSaveToggle.querySelector('.label').innerText = 'SAVE: OFF';
   }
+  playSound('toggle');
 });
+
+function showSavePromptOverlay(finalScore) {
+  if (promptScoreVal) promptScoreVal.innerText = finalScore;
+  if (promptPreviewImg) {
+    if (playerPhoto) {
+      promptPreviewImg.src = playerPhoto;
+      promptPreviewImg.style.display = 'block';
+    } else {
+      promptPreviewImg.src = '';
+      promptPreviewImg.style.display = 'none';
+    }
+  }
+  if (savePromptOverlay) savePromptOverlay.style.display = 'flex';
+}
+
+function hideSavePromptOverlay() {
+  if (savePromptOverlay) savePromptOverlay.style.display = 'none';
+}
+
+if (btnSaveYes) {
+  btnSaveYes.addEventListener('click', () => {
+    initAudio();
+    playSound('yes');
+    hideSavePromptOverlay();
+    saveScore(score, true);
+    loadLeaderboard();
+    
+    lastGameScore = score;
+    hasPlayed = true;
+
+    resetGameStats();
+    setGameState(STATE_CALIBRATING);
+    startCooldown();
+  });
+}
+
+if (btnSaveNo) {
+  btnSaveNo.addEventListener('click', () => {
+    initAudio();
+    playSound('no');
+    hideSavePromptOverlay();
+    
+    lastGameScore = score;
+    hasPlayed = true;
+
+    resetGameStats();
+    setGameState(STATE_CALIBRATING);
+    startCooldown();
+  });
+}
 
 // Load Leaderboard from localStorage
 function loadLeaderboard() {
@@ -371,8 +467,18 @@ function escapeHTML(str) {
   );
 }
 
-function saveScore(scoreVal) {
-  if (!shouldSaveScore) {
+function qualifiesForTop3(scoreVal) {
+  if (scoreVal <= 0) return false;
+  let board = JSON.parse(localStorage.getItem('hype_leaderboard_v7') || '[]');
+  board.sort((a, b) => b.score - a.score);
+  if (board.length < 3) {
+    return true;
+  }
+  return scoreVal >= board[2].score;
+}
+
+function saveScore(scoreVal, force = false) {
+  if (!shouldSaveScore && !force) {
     console.log("Saving disabled by player.");
     return;
   }
@@ -408,6 +514,7 @@ function getHypeTier(s) {
 
 function resetGameStats() {
   score = 0;
+  bobCount = 0;
   hype = 0;
   combo = 0;
   multiplier = 1;
@@ -452,7 +559,6 @@ function setGameState(newState) {
   loadingOverlay.style.display = 'none';
   startOverlay.style.display = 'none';
   countdownOverlay.style.display = 'none';
-  gameoverOverlay.style.display = 'none';
   
   if (newState === STATE_LOADING) {
     loadingOverlay.style.display = 'flex';
@@ -461,6 +567,16 @@ function setGameState(newState) {
     startOverlay.style.display = 'flex';
     countdownTimeLeft = 1500;
     calibrationStatusEl.innerText = "Put both palms in screen view to activate...";
+    
+    // Display combined gameover banner inside start overlay if player just finished a game
+    if (startGameoverBanner && startFinalScoreVal) {
+      if (hasPlayed) {
+        startFinalScoreVal.innerText = lastGameScore;
+        startGameoverBanner.style.display = 'block';
+      } else {
+        startGameoverBanner.style.display = 'none';
+      }
+    }
   } 
   else if (newState === STATE_COUNTDOWN) {
     countdownOverlay.style.display = 'flex';
@@ -476,33 +592,73 @@ function setGameState(newState) {
     if (!isAudioMuted) startBassTrack();
   } 
   else if (newState === STATE_GAMEOVER) {
-    gameoverOverlay.style.display = 'flex';
-    finalScoreValEl.innerText = score;
-    
     playSound('gameover');
     stopBassTrack();
 
-    // Automatically save score and update leaderboard
-    saveScore(score);
-    loadLeaderboard();
+    // If shouldSaveScore is ON, save automatically without prompt
+    if (shouldSaveScore) {
+      saveScore(score);
+      loadLeaderboard();
 
-    // Start auto-start idle countdown to return to calibration automatically
-    gameOverSecondsLeft = 4;
-    autoResetMessageEl.innerText = `RESETTING TO READY STATE IN ${gameOverSecondsLeft}s...`;
-    
-    if (gameOverCountdownInterval) clearInterval(gameOverCountdownInterval);
-    gameOverCountdownInterval = setInterval(() => {
-      gameOverSecondsLeft--;
-      if (gameOverSecondsLeft > 0) {
-        autoResetMessageEl.innerText = `RESETTING TO READY STATE IN ${gameOverSecondsLeft}s...`;
-      } else {
-        clearInterval(gameOverCountdownInterval);
-        gameOverCountdownInterval = null;
-        resetGameStats();
-        setGameState(STATE_CALIBRATING);
-      }
-    }, 1000);
+      // Save final score and flag for combined starting overlay
+      lastGameScore = score;
+      hasPlayed = true;
+
+      // Transition immediately back to calibration ready state
+      resetGameStats();
+      spawnSkullBurst();
+      setGameState(STATE_CALIBRATING);
+
+      // Start 3-second cooldown
+      startCooldown();
+    } 
+    // If shouldSaveScore is OFF, check if it qualifies for top 3 and prompt
+    else if (qualifiesForTop3(score)) {
+      showSavePromptOverlay(score);
+      spawnSkullBurst();
+    } 
+    // If shouldSaveScore is OFF and not in top 3, proceed without saving/prompting
+    else {
+      lastGameScore = score;
+      hasPlayed = true;
+
+      resetGameStats();
+      spawnSkullBurst();
+      setGameState(STATE_CALIBRATING);
+
+      // Start 3-second cooldown
+      startCooldown();
+    }
   }
+}
+
+function startCooldown() {
+  isCooldownActive = true;
+  cooldownTimeLeft = 3;
+  
+  const startBlocker = document.getElementById('btn-start-game');
+  if (startBlocker) {
+    startBlocker.innerText = `NEXT GAME IN ${cooldownTimeLeft}s`;
+    startBlocker.classList.add('cooldown-mode');
+  }
+  
+  if (cooldownInterval) clearInterval(cooldownInterval);
+  cooldownInterval = setInterval(() => {
+    cooldownTimeLeft--;
+    if (cooldownTimeLeft > 0) {
+      if (startBlocker) {
+        startBlocker.innerText = `NEXT GAME IN ${cooldownTimeLeft}s`;
+      }
+    } else {
+      clearInterval(cooldownInterval);
+      cooldownInterval = null;
+      isCooldownActive = false;
+      if (startBlocker) {
+        startBlocker.innerText = 'WAITING FOR PALMS...';
+        startBlocker.classList.remove('cooldown-mode');
+      }
+    }
+  }, 1000);
 }
 
 function runCountdown() {
@@ -614,8 +770,17 @@ function takeSnapshot() {
   snapCtx.scale(-1, 1);
   
   try {
-    // Draw the raw webcam stream
-    snapCtx.drawImage(videoEl, 0, 0, snapCanvas.width, snapCanvas.height);
+    // Zoom in slightly on the center of the video frame
+    const vw = videoEl.videoWidth || 640;
+    const vh = videoEl.videoHeight || 480;
+    const zoom = 1.35; // 1.35x zoom on face area
+    const sw = vw / zoom;
+    const sh = vh / zoom;
+    const sx = (vw - sw) / 2;
+    const sy = (vh - sh) / 2;
+    
+    // Draw the raw webcam stream with the zoom crop
+    snapCtx.drawImage(videoEl, sx, sy, sw, sh, 0, 0, snapCanvas.width, snapCanvas.height);
     playerPhoto = snapCanvas.toDataURL('image/jpeg', 0.8);
   } catch (err) {
     console.error("Failed to capture snapshot: ", err);
@@ -750,9 +915,15 @@ function processHandGestures(results) {
   // Calibration state: start countdown immediately when hands are in position
   if (gameState === STATE_CALIBRATING) {
     if (handsDetected >= 2) {
-      setGameState(STATE_COUNTDOWN);
+      if (!isCooldownActive) {
+        setGameState(STATE_COUNTDOWN);
+      }
     } else {
-      calibrationStatusEl.innerText = "Waiting for BOTH hands to appear...";
+      if (!isCooldownActive) {
+        calibrationStatusEl.innerText = "Waiting for BOTH hands to appear...";
+      } else {
+        calibrationStatusEl.innerText = "Game Over! Cooldown active...";
+      }
     }
     return;
   }
@@ -872,9 +1043,52 @@ function trackBobbingScale(leftHand, rightHand) {
         bobTimes.push(performance.now());
         playSound('bob');
         
+        bobCount++;
+        
+        let floatingText = `+${basePointsPerBob * multiplier}`;
+        let textColor = '#ff0000';
+        let customSize = 20;
+        
+        const isDiv3 = (bobCount % 3 === 0);
+        const isDiv5 = (bobCount % 5 === 0);
+        
+        if (isDiv3 && isDiv5) {
+          const slangBoth = [
+            'SKIBIDI SIGMA!', 'OHIO GYATT!', 'LEVEL 10 RIZZ!', 'FANUM TAXED!', 'MEWING CHAMP!'
+          ];
+          floatingText = slangBoth[Math.floor(Math.random() * slangBoth.length)];
+          textColor = '#ff00ff';
+          customSize = 28;
+        } else if (isDiv3) {
+          const slang3 = [
+            'RIZZLER', 'SKIBIDI', 'GYATT', 'OHIO', 'SIGMA'
+          ];
+          floatingText = slang3[Math.floor(Math.random() * slang3.length)];
+          textColor = '#ffff00';
+          customSize = 24;
+        } else if (isDiv5) {
+          const slang5 = [
+            'MEWING', 'LOOKSMAXXING', 'FANUM', 'GRIMACE', 'KAI CENAT'
+          ];
+          floatingText = slang5[Math.floor(Math.random() * slang5.length)];
+          textColor = '#00ffff';
+          customSize = 24;
+        }
+        
         const scoreX = (leftHand[9].x + rightHand[9].x) * 0.5 * canvasEl.width;
         const scoreY = Math.min(leftHand[9].y, rightHand[9].y) * canvasEl.height - 20;
-        addFloatingText(scoreX, scoreY, `+${basePointsPerBob * multiplier}`, '#ff0000');
+        
+        // Add floating text with custom sizes for brainrot
+        floatingTexts.push({
+          x: scoreX,
+          y: scoreY,
+          text: floatingText,
+          color: textColor,
+          fontSize: customSize,
+          opacity: 1.0,
+          life: 25
+        });
+        
         scorePoints(basePointsPerBob);
         
         historyL.lastMidCrossDir = currentCrossL;
@@ -1007,6 +1221,9 @@ function drawScreen(results) {
     flashOpacity -= 0.15; // Decays over ~6 frames
   }
 
+  // 5.5 Update corner spinning toilet GIF popups
+  updateToiletCornerPops();
+
   // 6. Shake screen on canvas
   if (gameState === STATE_PLAYING && multiplier >= 5) {
     canvasEl.classList.add('screen-shake-effect');
@@ -1071,6 +1288,91 @@ function drawOscilloscope() {
   ctx.fillText('WAVES', x + 2, y + height + 9);
 }
 
+function spawnSkullBurst() {
+  for (let i = 0; i < 25; i++) {
+    const rx = Math.random() * canvasEl.width;
+    const ry = Math.random() * canvasEl.height;
+    floatingTexts.push({
+      x: rx,
+      y: ry,
+      text: '💀',
+      color: '#ff0000',
+      fontSize: 35 + Math.random() * 25,
+      opacity: 1.0,
+      life: 40 + Math.random() * 30
+    });
+  }
+}
+
+const CORNER_EMOJIS = ['🤫', '🍷', '💀', '👑', '👽', '💩', '🤡', '🤖', '👾'];
+
+function updateToiletCornerPops() {
+  if (gameState !== STATE_PLAYING) {
+    // Turn off all toilet popups
+    toiletPops.forEach((el, idx) => {
+      if (el) {
+        el.classList.remove('toilet-active');
+        const imgEl = el.querySelector('.pop-gif');
+        const emojiEl = el.querySelector('.pop-emoji');
+        if (imgEl) imgEl.style.display = 'none';
+        if (emojiEl) emojiEl.style.display = 'none';
+      }
+      toiletActiveTimers[idx] = 0;
+    });
+    return;
+  }
+
+  // Decr active timers
+  toiletActiveTimers.forEach((t, idx) => {
+    if (t > 0) {
+      toiletActiveTimers[idx]--;
+      if (toiletActiveTimers[idx] <= 0) {
+        if (toiletPops[idx]) {
+          toiletPops[idx].classList.remove('toilet-active');
+          const imgEl = toiletPops[idx].querySelector('.pop-gif');
+          const emojiEl = toiletPops[idx].querySelector('.pop-emoji');
+          if (imgEl) imgEl.style.display = 'none';
+          if (emojiEl) emojiEl.style.display = 'none';
+        }
+      }
+    }
+  });
+
+  // Randomly trigger a popup (approx 2% chance per frame)
+  if (Math.random() < 0.02) {
+    const inactiveIndices = [];
+    toiletActiveTimers.forEach((t, idx) => {
+      if (t <= 0) inactiveIndices.push(idx);
+    });
+
+    if (inactiveIndices.length > 0) {
+      const targetIdx = inactiveIndices[Math.floor(Math.random() * inactiveIndices.length)];
+      toiletActiveTimers[targetIdx] = 45; // ~1.5 seconds at 30fps
+      
+      const el = toiletPops[targetIdx];
+      if (el) {
+        const imgEl = el.querySelector('.pop-gif');
+        const emojiEl = el.querySelector('.pop-emoji');
+        
+        // 50% chance for skibidi toilet GIF, 50% chance for random original emoji
+        if (Math.random() < 0.5) {
+          if (imgEl) imgEl.style.display = 'block';
+          if (emojiEl) emojiEl.style.display = 'none';
+        } else {
+          if (imgEl) imgEl.style.display = 'none';
+          if (emojiEl) {
+            const randomEmoji = CORNER_EMOJIS[Math.floor(Math.random() * CORNER_EMOJIS.length)];
+            emojiEl.innerText = randomEmoji;
+            emojiEl.style.display = 'block';
+          }
+        }
+        
+        el.classList.add('toilet-active');
+      }
+    }
+  }
+}
+
 function renderFloatingTexts() {
   for (let i = floatingTexts.length - 1; i >= 0; i--) {
     const ft = floatingTexts[i];
@@ -1079,7 +1381,8 @@ function renderFloatingTexts() {
     ft.life--;
 
     ctx.save();
-    ctx.font = 'bold 20px "Arial"';
+    const sz = ft.fontSize || 20;
+    ctx.font = `bold ${sz}px "Arial"`;
     ctx.fillStyle = ft.color;
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 3;
@@ -1154,6 +1457,7 @@ function initMediaPipe() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  localStorage.setItem('hype_leaderboard_v7', '[]'); // Clear leaderboard for now
   setGameState(STATE_LOADING);
   initMediaPipe();
 });

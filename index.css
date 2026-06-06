@@ -357,6 +357,13 @@ body {
   animation: blockerColor 0.5s ease infinite alternate;
 }
 
+.calibration-blocker.cooldown-mode {
+  background: #888888 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+  animation: none !important;
+}
+
 @keyframes blockerColor {
   0% { background: #ffcc00; color: #000; }
   100% { background: #ff0000; color: #fff; }
@@ -630,4 +637,54 @@ body {
   0% { transform: translate(2px, 2px); }
   50% { transform: translate(-2px, -2px); }
   100% { transform: translate(2px, -2px); }
+}
+
+/* Obnoxious retro blinking effect */
+.blink-text {
+  animation: blinkEffect 0.4s steps(2, start) infinite;
+}
+
+@keyframes blinkEffect {
+  to { visibility: hidden; }
+}
+
+/* Corner Toilet GIF Popups */
+.corner-toilet-pop {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  z-index: 50;
+  pointer-events: none;
+  display: none;
+  border: 3px solid #000;
+  background: #ffccff;
+  padding: 4px;
+  box-shadow: 4px 4px 0px #000;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+}
+
+#toilet-pop-tl { top: 20px; left: 20px; }
+#toilet-pop-tr { top: 20px; right: 80px; } /* offset from waves oscilloscope */
+#toilet-pop-bl { bottom: 20px; left: 20px; }
+#toilet-pop-br { bottom: 20px; right: 20px; }
+
+@keyframes toiletSpinShake {
+  0% { transform: rotate(0deg) translate(0px, 0px) scale(0.1); }
+  10% { transform: rotate(36deg) translate(2px, -2px) scale(1.0); }
+  20% { transform: rotate(72deg) translate(-2px, 1px) scale(1.0); }
+  30% { transform: rotate(108deg) translate(1px, -2px) scale(1.0); }
+  40% { transform: rotate(144deg) translate(-1px, 2px) scale(1.0); }
+  50% { transform: rotate(180deg) translate(2px, -1px) scale(1.0); }
+  60% { transform: rotate(216deg) translate(-2px, 2px) scale(1.0); }
+  70% { transform: rotate(252deg) translate(1px, -2px) scale(1.0); }
+  80% { transform: rotate(288deg) translate(-1px, 1px) scale(1.0); }
+  90% { transform: rotate(324deg) translate(2px, -1px) scale(1.0); }
+  100% { transform: rotate(360deg) translate(0px, 0px) scale(1.0); }
+}
+
+.toilet-active {
+  display: flex !important;
+  animation: toiletSpinShake 1.5s linear infinite;
 }
