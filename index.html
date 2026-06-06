@@ -76,6 +76,8 @@
           </button>
         </div>
 
+
+
         <!-- Skrilla "Doot Doot" Emote GIF -->
         <div class="skrilla-gif-box" style="border: 3px solid #000; background: #ffccff; padding: 6px; text-align: center; box-shadow: 3px 3px 0px #000; margin: 14px auto 0 auto; max-width: 140px;">
           <img src="skrilla-doot.gif" alt="Skrilla Emote" style="width: 100%; max-height: 80px; object-fit: contain; border: 2px solid #000; background: #000;">
@@ -94,19 +96,19 @@
           <!-- Corner Toilet/Emoji Mixed Popups -->
           <div id="toilet-pop-tl" class="corner-toilet-pop">
             <img class="pop-gif" src="skibidi-spin.gif?v=36" alt="Skibidi Toilet" style="width: 100%; height: 100%; object-fit: contain; display: none;">
-            <span class="pop-emoji" style="font-size: 38px; display: none; line-height: 1;"></span>
+            <span class="pop-emoji" style="font-size: 5cqw; display: none; line-height: 1;"></span>
           </div>
           <div id="toilet-pop-tr" class="corner-toilet-pop">
             <img class="pop-gif" src="skibidi-spin.gif?v=36" alt="Skibidi Toilet" style="width: 100%; height: 100%; object-fit: contain; display: none;">
-            <span class="pop-emoji" style="font-size: 38px; display: none; line-height: 1;"></span>
+            <span class="pop-emoji" style="font-size: 5cqw; display: none; line-height: 1;"></span>
           </div>
           <div id="toilet-pop-bl" class="corner-toilet-pop">
             <img class="pop-gif" src="skibidi-spin.gif?v=36" alt="Skibidi Toilet" style="width: 100%; height: 100%; object-fit: contain; display: none;">
-            <span class="pop-emoji" style="font-size: 38px; display: none; line-height: 1;"></span>
+            <span class="pop-emoji" style="font-size: 5cqw; display: none; line-height: 1;"></span>
           </div>
           <div id="toilet-pop-br" class="corner-toilet-pop">
             <img class="pop-gif" src="skibidi-spin.gif?v=36" alt="Skibidi Toilet" style="width: 100%; height: 100%; object-fit: contain; display: none;">
-            <span class="pop-emoji" style="font-size: 38px; display: none; line-height: 1;"></span>
+            <span class="pop-emoji" style="font-size: 5cqw; display: none; line-height: 1;"></span>
           </div>
           
           <!-- Loading Overlay -->
@@ -120,17 +122,17 @@
 
           <!-- Start/Calibration Overlay -->
           <div class="screen-overlay" id="start-overlay" style="display: none;">
-            <div class="overlay-content">
+            <div class="overlay-content" style="width: 100%;">
               <!-- Combined Game Over banner, hidden initially -->
-              <div class="gameover-banner" id="start-gameover-banner" style="display: none; width: 100%; border: 4px solid #000; background: #ffcc00; padding: 12px; margin-bottom: 15px; box-shadow: 4px 4px 0px #000;">
-                <h2 class="text-shake highlight-blue" style="margin: 0 0 8px 0; font-size: 1.8rem; text-shadow: 2px 2px #fff;">🎉 GAME OVER!!! 🎉</h2>
-                <div class="final-score-display" style="border: none; padding: 0; background: none; margin-bottom: 4px;">
-                  <span class="final-label" style="font-size: 0.8rem; font-weight: bold; color: #000; display: block; margin-bottom: 4px;">YOUR FINAL SCORE:</span>
-                  <span class="final-value" id="start-final-score-val" style="font-size: 2.2rem; color: #ff00ff; font-weight: bold;">0</span>
+              <div class="gameover-banner overlay-card" id="start-gameover-banner" style="display: none; border-color: #000; background: #ffcc00; margin-bottom: 2cqw; margin-left: auto; margin-right: auto;">
+                <h2 class="text-shake highlight-blue overlay-title-large" style="margin: 0 0 1cqw 0;">🎉 GAME OVER!!! 🎉</h2>
+                <div class="final-score-display" style="border: none; padding: 0; background: none; margin-bottom: 0.5cqw;">
+                  <span class="final-label overlay-photo-label" style="display: block; margin-bottom: 0.5cqw;">YOUR FINAL SCORE:</span>
+                  <span class="final-value overlay-score-val" id="start-final-score-val">0</span>
                 </div>
               </div>
 
-              <div class="instruction-simple" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 15px; color: #000; text-transform: uppercase;">
+              <div class="instruction-simple overlay-subtitle">
                 👋 Hold both palms up to start! 👋
               </div>
               <div id="btn-start-game" class="calibration-blocker">
@@ -147,28 +149,35 @@
 
           <!-- Save Leaderboard Prompt Overlay -->
           <div class="screen-overlay" id="save-prompt-overlay" style="display: none; background: rgba(0, 255, 0, 0.95);">
-            <div class="overlay-content" style="background: #ffffcc; border: 6px solid #000; padding: 20px; box-shadow: 8px 8px 0px #000; max-width: 500px; width: 90%;">
-              <h2 class="text-shake highlight-red" style="margin: 0 0 10px 0; font-size: 1.8rem; text-shadow: 2px 2px #fff;">🏆 TOP 3 HIGHEST SCORE! 🏆</h2>
-              <p style="font-weight: bold; font-size: 1.1rem; margin-bottom: 12px; color: #000;">
-                YOU SCORED <span id="prompt-score-val" style="color: #ff00ff; font-size: 1.4rem;">0</span> PTS!
+            <div class="overlay-card">
+              <h2 class="text-shake highlight-red overlay-title-large">🏆 TOP 3 HIGHEST SCORE! 🏆</h2>
+              <p class="overlay-text-body">
+                YOU SCORED <span id="prompt-score-val" class="overlay-score-val">0</span> PTS!
               </p>
               
               <!-- Captured photo preview box -->
-              <div class="photo-preview-box" style="margin: 0 auto 15px auto; border: 3px solid #000; background: #fff; padding: 6px; box-shadow: 4px 4px 0px #000;">
-                <div class="photo-label" style="font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; color: #000;">YOUR HYPE SNAPSHOT</div>
-                <img id="prompt-preview-img" src="" alt="Leaderboard Snapshot" style="width: 200px; height: 150px; border: 2px solid #000; object-fit: cover; background-color: #333;">
+              <div class="overlay-photo-box">
+                <div class="overlay-photo-label">YOUR HYPE SNAPSHOT</div>
+                <img id="prompt-preview-img" class="overlay-photo-img" src="" alt="Leaderboard Snapshot">
               </div>
 
-              <p style="font-weight: bold; font-size: 0.95rem; margin-bottom: 15px; color: #000;">
+              <p class="overlay-text-body">
                 DO YOU WANT TO SAVE YOUR PICTURE AND SCORE ON THE LEADERBOARD?
               </p>
 
-              <div style="display: flex; gap: 20px; justify-content: center; width: 100%;">
-                <button id="btn-save-yes" class="btn-retro" style="background: #00ff00; color: #000; font-size: 1.2rem; padding: 10px 24px; min-width: 100px;">YES</button>
-                <button id="btn-save-no" class="btn-retro" style="background: #ff0000; color: #fff; font-size: 1.2rem; padding: 10px 24px; min-width: 100px;">NO</button>
+              <div class="overlay-btn-group">
+                <button id="btn-save-yes" class="btn-retro overlay-btn" style="background: #00ff00; color: #000;">YES</button>
+                <button id="btn-save-no" class="btn-retro overlay-btn" style="background: #ff0000; color: #fff;">NO</button>
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Slider to adjust webcam screen size -->
+        <div class="stat-box camera-size-box" style="margin-top: 16px; margin-bottom: 0; text-align: center; width: 100%; max-width: 500px; box-shadow: 4px 4px 0px #000;">
+          <div class="stat-label" style="font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">📺 CAMERA SIZE</div>
+          <input type="range" id="slider-camera-size" min="400" max="1000" value="800" step="10" style="width: 100%; margin: 8px 0; cursor: pointer;" aria-label="Camera Size Slider">
+          <div id="camera-size-display" style="font-size: 0.8rem; font-weight: bold; color: #000;">800px × 600px</div>
         </div>
       </section>
 
@@ -197,6 +206,6 @@
   </div>
 
   <!-- Game Logic Script -->
-  <script src="app.js?v=38"></script>
+  <script src="app.js?v=41"></script>
 </body>
 </html>

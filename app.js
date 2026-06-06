@@ -88,6 +88,8 @@ const countdownOverlay = document.getElementById('countdown-overlay');
 const countdownValEl = document.getElementById('countdown-val');
 const btnAudioToggle = document.getElementById('btn-audio-toggle');
 const btnSaveToggle = document.getElementById('btn-save-toggle');
+const sliderCameraSize = document.getElementById('slider-camera-size');
+const cameraSizeDisplay = document.getElementById('camera-size-display');
 const savePromptOverlay = document.getElementById('save-prompt-overlay');
 const promptScoreVal = document.getElementById('prompt-score-val');
 const promptPreviewImg = document.getElementById('prompt-preview-img');
@@ -411,6 +413,31 @@ if (btnSaveNo) {
     setGameState(STATE_CALIBRATING);
     startCooldown();
   });
+}
+
+if (sliderCameraSize) {
+  const updateCameraSize = () => {
+    const w = parseInt(sliderCameraSize.value);
+    const h = Math.round(w * 0.75); // Maintain 4:3 aspect ratio
+    
+    if (canvasContainerEl) {
+      canvasContainerEl.style.width = `${w}px`;
+      canvasContainerEl.style.height = `${h}px`;
+    }
+    
+    requestAnimationFrame(() => {
+      if (canvasContainerEl && cameraSizeDisplay) {
+        const rect = canvasContainerEl.getBoundingClientRect();
+        const actualW = Math.round(rect.width);
+        const actualH = Math.round(rect.height);
+        cameraSizeDisplay.innerText = `${actualW}px × ${actualH}px`;
+      }
+    });
+  };
+  
+  sliderCameraSize.addEventListener('input', updateCameraSize);
+  updateCameraSize(); // Sync initially
+  window.addEventListener('resize', updateCameraSize); // Sync on window resizing
 }
 
 // Load Leaderboard from localStorage

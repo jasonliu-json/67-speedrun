@@ -255,7 +255,8 @@ body {
 
 /* Center Panel - Canvas box */
 .panel-center {
-  width: 816px; /* 800px canvas + 8px border * 2 */
+  width: auto;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -265,11 +266,14 @@ body {
 .canvas-container {
   position: relative;
   width: 800px;
-  height: 600px;
+  max-width: min(100%, calc(70vh * 4 / 3));
+  height: auto !important;
+  aspect-ratio: 4 / 3 !important;
   background: #fff;
   border: 8px solid #ff0000; /* bright red border */
   box-shadow: 8px 8px 0px #000000;
   overflow: hidden;
+  container-type: size;
 }
 
 /* Solid red borders when hype kicks in */
@@ -329,9 +333,9 @@ body {
 }
 
 .overlay-content h2 {
-  font-size: 2rem;
+  font-size: 4cqw;
   color: #ff0000;
-  text-shadow: 2px 2px #fff;
+  text-shadow: 0.3cqw 0.3cqw #fff;
 }
 
 .instructions-quick {
@@ -350,9 +354,9 @@ body {
 
 .calibration-blocker {
   background: #ffcc00;
-  border: 4px dashed red;
-  padding: 10px 20px;
-  font-size: 1.1rem;
+  border: 0.5cqw dashed red;
+  padding: 1.2cqw 2.4cqw;
+  font-size: 2.8cqw;
   font-weight: bold;
   animation: blockerColor 0.5s ease infinite alternate;
 }
@@ -370,16 +374,16 @@ body {
 }
 
 .status-subtext {
-  font-size: 0.65rem;
+  font-size: 1.6cqw;
   color: #000;
   font-weight: bold;
 }
 
 /* Ugly spinner */
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 8px solid #ff0000;
+  width: 5cqw;
+  height: 5cqw;
+  border: 1cqw solid #ff0000;
   border-left-color: #0000ff;
   animation: spin 0.5s linear infinite;
 }
@@ -390,10 +394,10 @@ body {
 
 /* Countdown big text */
 .countdown-text {
-  font-size: 10rem;
+  font-size: 25cqw;
   font-weight: bold;
   color: #ff00ff;
-  text-shadow: 4px 4px 0px #000;
+  text-shadow: 1cqw 1cqw 0px #000;
   animation: countdownPulse 1s ease infinite;
 }
 
@@ -651,24 +655,121 @@ body {
 /* Corner Toilet GIF Popups */
 .corner-toilet-pop {
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width: 10cqw;
+  height: 10cqw;
+  min-width: 40px;
+  min-height: 40px;
   z-index: 50;
   pointer-events: none;
   display: none;
-  border: 3px solid #000;
+  border: 0.4cqw solid #000;
   background: #ffccff;
-  padding: 4px;
-  box-shadow: 4px 4px 0px #000;
+  padding: 0.5cqw;
+  box-shadow: 0.5cqw 0.5cqw 0px #000;
   border-radius: 50%;
   justify-content: center;
   align-items: center;
 }
 
-#toilet-pop-tl { top: 20px; left: 20px; }
-#toilet-pop-tr { top: 20px; right: 80px; } /* offset from waves oscilloscope */
-#toilet-pop-bl { bottom: 20px; left: 20px; }
-#toilet-pop-br { bottom: 20px; right: 20px; }
+#toilet-pop-tl { top: 2.5cqw; left: 2.5cqw; }
+#toilet-pop-tr { top: 2.5cqw; right: 10cqw; } /* offset from waves oscilloscope */
+#toilet-pop-bl { bottom: 2.5cqw; left: 2.5cqw; }
+#toilet-pop-br { bottom: 2.5cqw; right: 2.5cqw; }
+
+/* Container Query Responsive Overlay Classes */
+.overlay-card {
+  background: #ffffcc;
+  border: 0.8cqw solid #000;
+  padding: 3cqw;
+  box-shadow: 1cqw 1cqw 0px #000;
+  max-width: 65cqw;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5cqw;
+}
+
+.overlay-title-large {
+  margin: 0 0 1.2cqw 0;
+  font-size: 4.5cqw;
+  text-shadow: 0.3cqw 0.3cqw 0px #fff;
+}
+
+.overlay-subtitle {
+  font-weight: bold;
+  font-size: 2.2cqw;
+  margin-bottom: 1.5cqw;
+  color: #000;
+  text-transform: uppercase;
+}
+
+.overlay-text-body {
+  font-weight: bold;
+  font-size: 2cqw;
+  margin-bottom: 2cqw;
+  color: #000;
+}
+
+.overlay-score-val {
+  font-size: 5.5cqw;
+  color: #ff00ff;
+  font-weight: bold;
+}
+
+/* Photo Preview Box and contents */
+.overlay-photo-box {
+  margin: 0 auto 2cqw auto;
+  border: 0.4cqw solid #000;
+  background: #fff;
+  padding: 0.8cqw;
+  box-shadow: 0.6cqw 0.6cqw 0px #000;
+  text-align: center;
+}
+
+.overlay-photo-label {
+  font-size: 1.6cqw;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 0.6cqw;
+  color: #000;
+}
+
+.overlay-photo-img {
+  width: 26cqw;
+  height: 19.5cqw;
+  border: 0.3cqw solid #000;
+  object-fit: cover;
+  background-color: #333;
+  display: block;
+}
+
+/* Buttons in Overlay */
+.overlay-btn-group {
+  display: flex;
+  gap: 3cqw;
+  justify-content: center;
+  width: 100%;
+}
+
+.overlay-btn {
+  font-size: 2.6cqw;
+  padding: 1.2cqw 3cqw;
+  border: 0.5cqw solid #000;
+  box-shadow: 0.5cqw 0.5cqw 0px #000;
+  min-width: 15cqw;
+  color: #000;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.05s;
+  text-decoration: none;
+  text-align: center;
+}
+
+.overlay-btn:active {
+  transform: translate(0.3cqw, 0.3cqw);
+  box-shadow: 0.2cqw 0.2cqw 0px #000;
+}
 
 @keyframes toiletSpinShake {
   0% { transform: rotate(0deg) translate(0px, 0px) scale(0.1); }
