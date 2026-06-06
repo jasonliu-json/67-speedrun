@@ -95,6 +95,8 @@ const promptScoreVal = document.getElementById('prompt-score-val');
 const promptPreviewImg = document.getElementById('prompt-preview-img');
 const btnSaveYes = document.getElementById('btn-save-yes');
 const btnSaveNo = document.getElementById('btn-save-no');
+const promptQuestionText = document.getElementById('prompt-question-text');
+const promptBtnGroup = document.getElementById('prompt-btn-group');
 const calibrationStatusEl = document.getElementById('calibration-status');
 const startGameoverBanner = document.getElementById('start-gameover-banner');
 const startFinalScoreVal = document.getElementById('start-final-score-val');
@@ -365,7 +367,7 @@ btnSaveToggle.addEventListener('click', () => {
   playSound('toggle');
 });
 
-function showSavePromptOverlay(finalScore) {
+function showSavePromptOverlay(finalScore, isAuto = false) {
   if (promptScoreVal) promptScoreVal.innerText = finalScore;
   if (promptPreviewImg) {
     if (playerPhoto) {
@@ -375,6 +377,14 @@ function showSavePromptOverlay(finalScore) {
       promptPreviewImg.src = '';
       promptPreviewImg.style.display = 'none';
     }
+  }
+  if (promptQuestionText) {
+    promptQuestionText.innerText = isAuto 
+      ? 'SAVING TO LEADERBOARD AUTOMATICALLY...' 
+      : 'DO YOU WANT TO SAVE YOUR PICTURE AND SCORE ON THE LEADERBOARD?';
+  }
+  if (promptBtnGroup) {
+    promptBtnGroup.style.display = isAuto ? 'none' : 'flex';
   }
   if (savePromptOverlay) savePromptOverlay.style.display = 'flex';
 }
@@ -622,7 +632,7 @@ function setGameState(newState) {
     playSound('gameover');
     stopBassTrack();
 
-    // If shouldSaveScore is ON, save automatically without prompt
+    // If shouldSaveScore is ON, save automatically
     if (shouldSaveScore) {
       saveScore(score);
       loadLeaderboard();
@@ -631,17 +641,27 @@ function setGameState(newState) {
       lastGameScore = score;
       hasPlayed = true;
 
-      // Transition immediately back to calibration ready state
-      resetGameStats();
-      spawnSkullBurst();
-      setGameState(STATE_CALIBRATING);
+      // BUT if it qualifies for top 3, still show the trophy page and auto-proceed
+      if (qualifiesForTop3(score)) {
+        showSavePromptOverlay(score, true);
+        spawnSkullBurst();
+        
+        resetGameStats();
+        setGameState(STATE_CALIBRATING);
+        startCooldown();
+      } else {
+        // Transition immediately back to calibration ready state
+        resetGameStats();
+        spawnSkullBurst();
+        setGameState(STATE_CALIBRATING);
 
-      // Start 3-second cooldown
-      startCooldown();
+        // Start 3-second cooldown
+        startCooldown();
+      }
     } 
     // If shouldSaveScore is OFF, check if it qualifies for top 3 and prompt
     else if (qualifiesForTop3(score)) {
-      showSavePromptOverlay(score);
+      showSavePromptOverlay(score, false);
       spawnSkullBurst();
     } 
     // If shouldSaveScore is OFF and not in top 3, proceed without saving/prompting
@@ -684,6 +704,7 @@ function startCooldown() {
         startBlocker.innerText = 'WAITING FOR PALMS...';
         startBlocker.classList.remove('cooldown-mode');
       }
+      hideSavePromptOverlay();
     }
   }, 1000);
 }
