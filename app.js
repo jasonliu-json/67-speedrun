@@ -64,6 +64,7 @@ let audioCtx = null;
 let bgMusicInterval = null;
 let bgBeatStep = 0;
 let isAudioMuted = true;
+let shouldSaveScore = true;
 
 // DOM Elements
 const videoEl = document.getElementById('webcam-video');
@@ -86,6 +87,7 @@ const finalScoreValEl = document.getElementById('final-score-val');
 
 const autoResetMessageEl = document.getElementById('auto-reset-message');
 const btnAudioToggle = document.getElementById('btn-audio-toggle');
+const btnSaveToggle = document.getElementById('btn-save-toggle');
 const calibrationStatusEl = document.getElementById('calibration-status');
 
 const hypeFillBarEl = document.getElementById('hype-fill-bar');
@@ -302,11 +304,24 @@ btnAudioToggle.addEventListener('click', () => {
   }
 });
 
+btnSaveToggle.addEventListener('click', () => {
+  shouldSaveScore = !shouldSaveScore;
+  if (shouldSaveScore) {
+    btnSaveToggle.classList.remove('muted');
+    btnSaveToggle.querySelector('.icon').innerText = '💾';
+    btnSaveToggle.querySelector('.label').innerText = 'SAVE: ON';
+  } else {
+    btnSaveToggle.classList.add('muted');
+    btnSaveToggle.querySelector('.icon').innerText = '❌';
+    btnSaveToggle.querySelector('.label').innerText = 'SAVE: OFF';
+  }
+});
+
 // Load Leaderboard from localStorage
 function loadLeaderboard() {
-  let board = localStorage.getItem('hype_leaderboard_v5');
+  let board = localStorage.getItem('hype_leaderboard_v6');
   if (!board) {
-    localStorage.setItem('hype_leaderboard_v5', JSON.stringify(DEFAULT_LEADERBOARD));
+    localStorage.setItem('hype_leaderboard_v6', JSON.stringify(DEFAULT_LEADERBOARD));
     board = JSON.stringify(DEFAULT_LEADERBOARD);
   }
   const scores = JSON.parse(board);
@@ -347,7 +362,11 @@ function escapeHTML(str) {
 }
 
 function saveScore(scoreVal) {
-  let board = JSON.parse(localStorage.getItem('hype_leaderboard_v5') || '[]');
+  if (!shouldSaveScore) {
+    console.log("Saving disabled by player.");
+    return;
+  }
+  let board = JSON.parse(localStorage.getItem('hype_leaderboard_v6') || '[]');
   const tier = getHypeTier(scoreVal);
   
   // Create a new entry without name
@@ -366,7 +385,7 @@ function saveScore(scoreVal) {
     }
   });
   
-  localStorage.setItem('hype_leaderboard_v5', JSON.stringify(top10));
+  localStorage.setItem('hype_leaderboard_v6', JSON.stringify(top10));
 }
 
 function getHypeTier(s) {
