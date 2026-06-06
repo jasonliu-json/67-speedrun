@@ -319,9 +319,9 @@ btnSaveToggle.addEventListener('click', () => {
 
 // Load Leaderboard from localStorage
 function loadLeaderboard() {
-  let board = localStorage.getItem('hype_leaderboard_v6');
+  let board = localStorage.getItem('hype_leaderboard_v7');
   if (!board) {
-    localStorage.setItem('hype_leaderboard_v6', JSON.stringify(DEFAULT_LEADERBOARD));
+    localStorage.setItem('hype_leaderboard_v7', JSON.stringify(DEFAULT_LEADERBOARD));
     board = JSON.stringify(DEFAULT_LEADERBOARD);
   }
   const scores = JSON.parse(board);
@@ -329,15 +329,24 @@ function loadLeaderboard() {
 
   leaderboardCardsContainer.innerHTML = '';
   
-  // Show only the Top 3 scores
+  // Show only the Top 3 scores beside their photo cards
   scores.slice(0, 3).forEach((entry, i) => {
     const card = document.createElement('div');
     
     const isPlayerMatch = gameState === STATE_GAMEOVER && 
-                           entry.score === score;
+                           entry.score === score && 
+                           entry.photo === playerPhoto;
                            
     if (isPlayerMatch) {
       card.classList.add('rank-highlight');
+    }
+    
+    // Zoomed-in Photo box (blank if no photo present)
+    let photoHTML = '';
+    if (entry.photo) {
+      photoHTML = `<div class="leaderboard-img-wrapper"><img src="${entry.photo}" alt="Face"></div>`;
+    } else {
+      photoHTML = `<div class="leaderboard-img-wrapper"></div>`;
     }
     
     const rankLabels = ['1st Place', '2nd Place', '3rd Place'];
@@ -345,6 +354,7 @@ function loadLeaderboard() {
     
     card.className = `leaderboard-card ${cardClass}`;
     card.innerHTML = `
+      ${photoHTML}
       <div class="leaderboard-card-info">
         <div class="leaderboard-card-rank">${rankLabels[i]}</div>
         <div class="leaderboard-card-score">${entry.score} PTS</div>
@@ -366,7 +376,7 @@ function saveScore(scoreVal) {
     console.log("Saving disabled by player.");
     return;
   }
-  let board = JSON.parse(localStorage.getItem('hype_leaderboard_v6') || '[]');
+  let board = JSON.parse(localStorage.getItem('hype_leaderboard_v7') || '[]');
   const tier = getHypeTier(scoreVal);
   
   // Create a new entry without name
@@ -385,7 +395,7 @@ function saveScore(scoreVal) {
     }
   });
   
-  localStorage.setItem('hype_leaderboard_v6', JSON.stringify(top10));
+  localStorage.setItem('hype_leaderboard_v7', JSON.stringify(top10));
 }
 
 function getHypeTier(s) {
@@ -526,7 +536,11 @@ function startGameLoop() {
   gameTimerInterval = setInterval(() => {
     timeLeft -= 100;
     
-    // No snapshot taken per request
+    // Capture camera snapshot at target time
+    if (timeLeft <= snapshotTimeMs && !isSnapshotTaken) {
+      takeSnapshot();
+      isSnapshotTaken = true;
+    }
 
     decayHype();
 
@@ -586,7 +600,28 @@ function triggerNewSignChallenge() {
    Webcam Capture Snapshot Functionality
    ========================================================================== */
 
-// takeSnapshot function removed per request
+function takeSnapshot() {
+  playSound('shutter');
+  
+  // Draw current video frame to a higher-definition offscreen canvas (320x240)
+  const snapCanvas = document.createElement('canvas');
+  snapCanvas.width = 320;
+  snapCanvas.height = 240;
+  const snapCtx = snapCanvas.getContext('2d');
+  
+  // Mirror frame to match the display
+  snapCtx.translate(snapCanvas.width, 0);
+  snapCtx.scale(-1, 1);
+  
+  try {
+    // Draw the raw webcam stream
+    snapCtx.drawImage(videoEl, 0, 0, snapCanvas.width, snapCanvas.height);
+    playerPhoto = snapCanvas.toDataURL('image/jpeg', 0.8);
+  } catch (err) {
+    console.error("Failed to capture snapshot: ", err);
+    playerPhoto = null;
+  }
+}
 
 /* ==========================================================================
    Telemetry UI Updaters

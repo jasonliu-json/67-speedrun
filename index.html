@@ -31,10 +31,7 @@
         </h1>
         <p class="subtitle">⚠️ WARNING: HIGH BRAINROT LEVEL ⚠️</p>
       </div>
-      <div class="audio-control" style="display: flex; gap: 8px;">
-        <button id="btn-save-toggle" class="btn-retro" aria-label="Toggle Leaderboard Saving">
-          <span class="icon">💾</span> <span class="label">SAVE: ON</span>
-        </button>
+      <div class="audio-control">
         <button id="btn-audio-toggle" class="btn-retro muted" aria-label="Toggle Sound">
           <span class="icon">🔇</span> <span class="label">SOUND OFF</span>
         </button>
@@ -73,6 +70,14 @@
             <span class="mini-label">TIER</span>
             <span class="mini-value alert-text" id="hype-tier-val">CHILLIN'</span>
           </div>
+        </div>
+        
+        <!-- Switch button to toggle leaderboard updates -->
+        <div class="stat-box leaderboard-switch-box" style="margin-top: 14px; border: 3px solid #000; padding: 10px; background: #ffffcc; text-align: center;">
+          <div class="stat-label" style="font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">🏆 UPDATE LEADERBOARD?</div>
+          <button id="btn-save-toggle" class="btn-retro" style="width: 100%; box-shadow: 2px 2px 0px #000;" aria-label="Toggle Leaderboard Saving">
+            <span class="icon">💾</span> <span class="label">SAVE: ON</span>
+          </button>
         </div>
       </section>
 
@@ -156,6 +161,6 @@
   </div>
 
   <!-- Game Logic Script -->
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
