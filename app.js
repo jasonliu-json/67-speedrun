@@ -83,8 +83,6 @@ const countdownOverlay = document.getElementById('countdown-overlay');
 const countdownValEl = document.getElementById('countdown-val');
 const gameoverOverlay = document.getElementById('gameover-overlay');
 const finalScoreValEl = document.getElementById('final-score-val');
-const capturePreviewImg = document.getElementById('capture-preview-img');
-const noPhotoPlaceholder = document.getElementById('no-photo-taken');
 
 const autoResetMessageEl = document.getElementById('auto-reset-message');
 const btnAudioToggle = document.getElementById('btn-audio-toggle');
@@ -316,24 +314,15 @@ function loadLeaderboard() {
 
   leaderboardCardsContainer.innerHTML = '';
   
-  // Show only the Top 3 scores beside their photo cards
+  // Show only the Top 3 scores
   scores.slice(0, 3).forEach((entry, i) => {
     const card = document.createElement('div');
     
     const isPlayerMatch = gameState === STATE_GAMEOVER && 
-                           entry.score === score && 
-                           entry.photo === playerPhoto;
+                           entry.score === score;
                            
     if (isPlayerMatch) {
       card.classList.add('rank-highlight');
-    }
-    
-    // Zoomed-in Photo box (blank if no photo present)
-    let photoHTML = '';
-    if (entry.photo) {
-      photoHTML = `<div class="leaderboard-img-wrapper"><img src="${entry.photo}" alt="Face"></div>`;
-    } else {
-      photoHTML = `<div class="leaderboard-img-wrapper"></div>`;
     }
     
     const rankLabels = ['1st Place', '2nd Place', '3rd Place'];
@@ -341,7 +330,6 @@ function loadLeaderboard() {
     
     card.className = `leaderboard-card ${cardClass}`;
     card.innerHTML = `
-      ${photoHTML}
       <div class="leaderboard-card-info">
         <div class="leaderboard-card-rank">${rankLabels[i]}</div>
         <div class="leaderboard-card-score">${entry.score} PTS</div>
@@ -423,10 +411,6 @@ function resetGameStats() {
   if (hypePercentTextEl) hypePercentTextEl.innerText = '0%';
   timerValEl.innerText = `${(GAME_DURATION / 1000).toFixed(2)}s`;
   canvasContainerEl.className = 'canvas-container';
-  
-  capturePreviewImg.style.display = 'none';
-  capturePreviewImg.src = '';
-  noPhotoPlaceholder.style.display = 'flex';
 }
 
 /* ==========================================================================
@@ -465,17 +449,6 @@ function setGameState(newState) {
   else if (newState === STATE_GAMEOVER) {
     gameoverOverlay.style.display = 'flex';
     finalScoreValEl.innerText = score;
-    
-    // Update captured photo preview on gameover screen
-    if (playerPhoto) {
-      capturePreviewImg.src = playerPhoto;
-      capturePreviewImg.style.display = 'block';
-      noPhotoPlaceholder.style.display = 'none';
-    } else {
-      capturePreviewImg.style.display = 'none';
-      noPhotoPlaceholder.style.display = 'flex';
-      noPhotoPlaceholder.innerText = "Camera missed you!";
-    }
     
     playSound('gameover');
     stopBassTrack();
@@ -534,11 +507,7 @@ function startGameLoop() {
   gameTimerInterval = setInterval(() => {
     timeLeft -= 100;
     
-    // Capture camera snapshot at target time
-    if (timeLeft <= snapshotTimeMs && !isSnapshotTaken) {
-      takeSnapshot();
-      isSnapshotTaken = true;
-    }
+    // No snapshot taken per request
 
     decayHype();
 
@@ -598,31 +567,7 @@ function triggerNewSignChallenge() {
    Webcam Capture Snapshot Functionality
    ========================================================================== */
 
-function takeSnapshot() {
-  playSound('shutter');
-  
-  // Flash canvas white disabled per request
-  // flashOpacity = 1.0;
-  
-  // Draw current video frame to a higher-definition offscreen canvas (320x240)
-  const snapCanvas = document.createElement('canvas');
-  snapCanvas.width = 320;
-  snapCanvas.height = 240;
-  const snapCtx = snapCanvas.getContext('2d');
-  
-  // Mirror frame to match the display
-  snapCtx.translate(snapCanvas.width, 0);
-  snapCtx.scale(-1, 1);
-  
-  try {
-    // Draw the raw webcam stream
-    snapCtx.drawImage(videoEl, 0, 0, snapCanvas.width, snapCanvas.height);
-    playerPhoto = snapCanvas.toDataURL('image/jpeg', 0.8);
-  } catch (err) {
-    console.error("Failed to capture snapshot: ", err);
-    playerPhoto = null;
-  }
-}
+// takeSnapshot function removed per request
 
 /* ==========================================================================
    Telemetry UI Updaters
