@@ -13,8 +13,8 @@ let gameState = STATE_LOADING;
 
 // Game Settings
 const GAME_DURATION = 10000; // 10 seconds per game
-const BOB_THRESHOLD = 0.08;   // Minimum Y movement amplitude
-const SMOOTHING_FACTOR = 3;
+const BOB_THRESHOLD = 0.05;   // Minimum Y movement amplitude (tuned for sensitivity)
+const SMOOTHING_FACTOR = 2;   // Reduced smoothing for less latency
 
 // Game variables
 let score = 0;
@@ -830,8 +830,8 @@ function processHandGestures(results) {
 }
 
 function trackBobbingScale(leftHand, rightHand) {
-  const leftY = leftHand[0].y;
-  const rightY = rightHand[0].y;
+  const leftY = leftHand[9].y; // Track middle finger MCP joint (palm center) instead of wrist
+  const rightY = rightHand[9].y;
   
   const historyL = handHistory.left;
   const historyR = handHistory.right;
@@ -873,8 +873,8 @@ function trackBobbingScale(leftHand, rightHand) {
         bobTimes.push(performance.now());
         playSound('bob');
         
-        const scoreX = (leftHand[0].x + rightHand[0].x) * 0.5 * canvasEl.width;
-        const scoreY = Math.min(leftHand[0].y, rightHand[0].y) * canvasEl.height - 20;
+        const scoreX = (leftHand[9].x + rightHand[9].x) * 0.5 * canvasEl.width;
+        const scoreY = Math.min(leftHand[9].y, rightHand[9].y) * canvasEl.height - 20;
         addFloatingText(scoreX, scoreY, `+${basePointsPerBob * multiplier}`, '#ff0000');
         scorePoints(basePointsPerBob);
         
@@ -884,11 +884,11 @@ function trackBobbingScale(leftHand, rightHand) {
     }
   }
 
-  // Recalibrate margins slowly
-  historyL.minY += 0.001;
-  historyL.maxY -= 0.001;
-  historyR.minY += 0.001;
-  historyR.maxY -= 0.001;
+  // Recalibrate margins faster
+  historyL.minY += 0.002;
+  historyL.maxY -= 0.002;
+  historyR.minY += 0.002;
+  historyR.maxY -= 0.002;
 }
 
 /* ==========================================================================
