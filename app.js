@@ -14,7 +14,7 @@ let gameState = STATE_LOADING;
 // Game Settings
 const GAME_DURATION = 6700; // 6.7 seconds per game
 const BOB_THRESHOLD = 0.035;   // Minimum Y movement amplitude (tuned for sensitivity)
-const SMOOTHING_FACTOR = 2;   // Reduced smoothing for less latency
+const SMOOTHING_FACTOR = 1;   // Look at one frame (no smoothing) for minimum latency
 
 // Game variables
 let score = 0;
