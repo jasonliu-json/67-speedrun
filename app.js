@@ -13,7 +13,7 @@ let gameState = STATE_LOADING;
 
 // Game Settings
 const GAME_DURATION = 6700; // 6.7 seconds per game
-const BOB_THRESHOLD = 0.05;   // Minimum Y movement amplitude (tuned for sensitivity)
+const BOB_THRESHOLD = 0.035;   // Minimum Y movement amplitude (tuned for sensitivity)
 const SMOOTHING_FACTOR = 2;   // Reduced smoothing for less latency
 
 // Game variables
@@ -927,7 +927,7 @@ function landmarkDistance(l1, l2) {
 function isFingerExtended(tipIdx, pipIdx, wristLandmark, landmarks) {
   const tipDist = landmarkDistance(landmarks[tipIdx], wristLandmark);
   const pipDist = landmarkDistance(landmarks[pipIdx], wristLandmark);
-  return tipDist > pipDist * 1.2;
+  return tipDist > pipDist * 1.1;
 }
 
 function processHandGestures(results) {
@@ -1012,7 +1012,7 @@ function processHandGestures(results) {
         const ringExt = isFingerExtended(16, 14, wrist, hand);
         const pinkyExt = isFingerExtended(20, 18, wrist, hand);
 
-        if (touchDist < 0.07 && idxExt && midExt && ringExt && !pinkyExt) {
+        if (touchDist < 0.09 && idxExt && midExt && ringExt && !pinkyExt) {
           challengeComplete = true;
           handToHighlight = hand;
         }
@@ -1024,7 +1024,7 @@ function processHandGestures(results) {
         const pinkyExt = isFingerExtended(20, 18, wrist, hand);
         const ringExt = isFingerExtended(16, 14, wrist, hand);
 
-        if (touchDist < 0.07 && idxExt && midExt && pinkyExt && !ringExt) {
+        if (touchDist < 0.09 && idxExt && midExt && pinkyExt && !ringExt) {
           challengeComplete = true;
           handToHighlight = hand;
         }
